@@ -1,10 +1,11 @@
 from django.db import models
 class User(models.Model):
     STATUS_CHOICES = [
-        ('zartsa', 'Zartsa'),
-        ('school', 'School'),
         ('student', 'Student'),
         ('lecture', 'Lecture'),
+        ('super', 'Super'),
+        ('admin', 'Admin'),
+        ('school_admin', 'School_Admin'),
     ]
 
     username = models.CharField(max_length=150, unique=True)
@@ -22,3 +23,19 @@ class User(models.Model):
     def __str__(self):
         return self.username
 # Create your models here.
+
+class School(models.Model):
+    name = models.CharField(max_length=255)
+    address = models.CharField(max_length=255, blank=True)
+    phone_number = models.CharField(max_length=15, blank=True)
+    email = models.EmailField(blank=True)
+
+    def __str__(self):
+        return self.name
+
+class School_Admin(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='school_admin_profile')
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='school_admins', blank=True, null=True)
+
+    def __str__(self):
+        return self.user.username

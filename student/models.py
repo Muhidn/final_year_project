@@ -1,8 +1,10 @@
 from django.db import models
-from users.models import User
+from users.models import User, School
 
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile')
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='students', blank=True, null=True)
+    
     form = models.FileField(upload_to='student_forms/', blank=True, null=True)
     permit = models.FileField(upload_to='student_permits/', blank=True, null=True)
     theory_result = models.CharField(max_length=4, choices=[('pass', 'Pass'), ('fail', 'Fail')])
@@ -11,5 +13,52 @@ class Student(models.Model):
     document = models.FileField(upload_to='student_documents/', blank=True, null=True)
 
     def __str__(self):
+        return self.user.get_full_name()
+
+
+    def __str__(self):
         return self.user.username
-# Create your models here.
+
+class Lecture(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='lecture_profile')
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='lectures', blank=True, null=True)
+    license_class = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.subject}"
+
+class Attendance(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='attendances')
+    lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE, related_name='attendances')
+    date = models.DateField(auto_now_add=True)
+    status = models.CharField(
+        max_length=10,
+        choices=[('present', 'Present'), ('absent', 'Absent')],
+        default='present'
+    )
+
+    def __str__(self):
+        return f"{self.student.user.username} - {self.lecture.subject} on {self.date} ({self.status})"
+
+    class Meta:
+        unique_together = ('student', 'lecture', 'date')
+
+class Message(models.Model):
+    body = models.TextField()
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='messages')
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='messages')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Message to {self.student} at {self.school}: {self.body[:30]}"
+
+class Notification(models.Model):
+    body = models.TextField()
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='notifications')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Notification for {self.school}: {self.body[:30]}"
+
+
+
