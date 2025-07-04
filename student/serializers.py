@@ -1,7 +1,9 @@
 from rest_framework import serializers
 from .models import Student, Lecture, Attendance, Message, Notification
+from users.serializers import UserSerializer
 
 class StudentSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
     class Meta:
         model = Student
         fields = [
@@ -15,6 +17,13 @@ class StudentSerializer(serializers.ModelSerializer):
             'updated_at',
             'document',
         ]
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        from users.models import User  # Adjust if needed
+        user = User.objects.create(**user_data)
+        student = Student.objects.create(user=user, **validated_data)
+        return student
 
 class LectureSerializer(serializers.ModelSerializer):
     class Meta:

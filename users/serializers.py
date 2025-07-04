@@ -27,13 +27,6 @@ class SchoolSerializer(serializers.ModelSerializer):
         model = School
         fields = ['id', 'name', 'address', 'phone_number', 'email']
 
-class SchoolAdminSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
-    school = SchoolSerializer(required=False, allow_null=True)
-    class Meta:
-        model = School_Admin
-        fields = ['id', 'user', 'school']
-
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
@@ -51,3 +44,17 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError('Invalid credentials')
         data['user'] = user
         return data
+
+class SchoolAdminSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    school = serializers.PrimaryKeyRelatedField(queryset=School.objects.all())
+
+    class Meta:
+        model = School_Admin
+        fields = ['id', 'user', 'school']
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        user = User.objects.create(**user_data)
+        school_admin = School_Admin.objects.create(user=user, **validated_data)
+        return school_admin

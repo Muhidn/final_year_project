@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from .models import User, School, School_Admin
-from .serializers import UserSerializer, SchoolSerializer, SchoolAdminSerializer, LoginSerializer
+from .serializers import UserSerializer, SchoolSerializer, LoginSerializer, SchoolAdminSerializer
 
 class UserListCreateView(generics.ListCreateAPIView):
     queryset = User.objects.all()
@@ -30,6 +30,16 @@ class SchoolRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
 schoolRetrieveUpdateDestroyView = SchoolRetrieveUpdateDestroyView.as_view()
 
+class LoginView(APIView):
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        user_data = UserSerializer(user).data
+        return Response(user_data, status=status.HTTP_200_OK)
+
+loginView = LoginView.as_view()
+
 class SchoolAdminListCreateView(generics.ListCreateAPIView):
     queryset = School_Admin.objects.all()
     serializer_class = SchoolAdminSerializer
@@ -41,14 +51,4 @@ class SchoolAdminRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView
     serializer_class = SchoolAdminSerializer
 
 schoolAdminRetrieveUpdateDestroyView = SchoolAdminRetrieveUpdateDestroyView.as_view()
-
-class LoginView(APIView):
-    def post(self, request):
-        serializer = LoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        user_data = UserSerializer(user).data
-        return Response(user_data, status=status.HTTP_200_OK)
-
-loginView = LoginView.as_view()
 # Create your views here.

@@ -33,9 +33,10 @@ class School(models.Model):
     def __str__(self):
         return self.name
 
+
 class School_Admin(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='school_admin_profile')
-    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='school_admins', blank=True, null=True)
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='school_admins')
 
     def __str__(self):
         return self.user.username

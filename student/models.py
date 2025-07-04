@@ -4,11 +4,11 @@ from users.models import User, School
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_profile')
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='students', blank=True, null=True)
-    
+
     form = models.FileField(upload_to='student_forms/', blank=True, null=True)
     permit = models.FileField(upload_to='student_permits/', blank=True, null=True)
-    theory_result = models.CharField(max_length=4, choices=[('pass', 'Pass'), ('fail', 'Fail')])
-    practical_result = models.CharField(max_length=4, choices=[('pass', 'Pass'), ('fail', 'Fail')])
+    theory_result = models.CharField(max_length=40, choices=[('pass', 'Pass'), ('fail', 'Fail'), ('pending', 'Pending')], default='pending')
+    practical_result = models.CharField(max_length=40, choices=[('pass', 'Pass'), ('fail', 'Fail'), ('pending', 'Pending')], default='pending')
     updated_at = models.DateTimeField(auto_now=True)
     document = models.FileField(upload_to='student_documents/', blank=True, null=True)
 
@@ -18,6 +18,14 @@ class Student(models.Model):
 
     def __str__(self):
         return self.user.username
+
+    def save(self, *args, **kwargs):
+        # If no file is uploaded, set form and permit to 'pending' (string)
+        if not self.form:
+            self.form = None  # FileField must be None if no file
+        if not self.permit:
+            self.permit = None
+        super().save(*args, **kwargs)
 
 class Lecture(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='lecture_profile')
