@@ -33,7 +33,7 @@ class Lecture(models.Model):
     license_class = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"{self.user.username} - {self.subject}"
+        return f"{self.user.username} - {self.license_class}"
 
 class Attendance(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='attendances')
@@ -46,7 +46,7 @@ class Attendance(models.Model):
     )
 
     def __str__(self):
-        return f"{self.student.user.username} - {self.lecture.subject} on {self.date} ({self.status})"
+        return f"{self.student.user.username} - {self.lecture.license_class} on {self.date} ({self.status})"
 
     class Meta:
         unique_together = ('student', 'lecture', 'date')
