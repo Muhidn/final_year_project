@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, School, School_Admin
+from .models import User, School, School_Admin, Request
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -89,3 +89,42 @@ class SchoolAdminSerializer(serializers.ModelSerializer):
         user = User.objects.create(**user_data)
         school_admin = School_Admin.objects.create(user=user, **validated_data)
         return school_admin
+
+
+class RequestUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'email', 'username', 'phone_number']
+
+
+class RequestSerializer(serializers.ModelSerializer):
+    user = RequestUserSerializer(read_only=True)
+    school = serializers.PrimaryKeyRelatedField(read_only=True)
+    user_id = serializers.IntegerField(write_only=True)
+    school_id = serializers.IntegerField(write_only=True)
+    requested_at = serializers.DateTimeField(source='created_at', read_only=True)
+    
+    class Meta:
+        model = Request
+        fields = ['id', 'user', 'school', 'user_id', 'school_id', 'status', 'requested_at']
+        
+    def create(self, validated_data):
+        user_id = validated_data.pop('user_id')
+        school_id = validated_data.pop('school_id')
+        user = User.objects.get(id=user_id)
+        school = School.objects.get(id=school_id)
+        return Request.objects.create(user=user, school=school, **validated_data)
+        
+    def update(self, instance, validated_data):
+        user_id = validated_data.pop('user_id', None)
+        school_id = validated_data.pop('school_id', None)
+        
+        if user_id:
+            instance.user = User.objects.get(id=user_id)
+        if school_id:
+            instance.school = School.objects.get(id=school_id)
+            
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance

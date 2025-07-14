@@ -3,8 +3,8 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
-from .models import User, School, School_Admin
-from .serializers import UserSerializer, SchoolSerializer, LoginSerializer, SchoolAdminSerializer
+from .models import User, School, School_Admin, Request
+from .serializers import UserSerializer, SchoolSerializer, LoginSerializer, SchoolAdminSerializer, RequestSerializer
 
 class UserListCreateView(generics.ListCreateAPIView):
     queryset = User.objects.all()
@@ -51,4 +51,17 @@ class SchoolAdminRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView
     serializer_class = SchoolAdminSerializer
 
 schoolAdminRetrieveUpdateDestroyView = SchoolAdminRetrieveUpdateDestroyView.as_view()
+
+
+class RequestListCreateView(generics.ListCreateAPIView):
+    queryset = Request.objects.select_related('user', 'school').all()
+    serializer_class = RequestSerializer
+
+requestListCreateView = RequestListCreateView.as_view()
+
+class RequestRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Request.objects.select_related('user', 'school').all()
+    serializer_class = RequestSerializer
+
+requestRetrieveUpdateDestroyView = RequestRetrieveUpdateDestroyView.as_view()
 # Create your views here.

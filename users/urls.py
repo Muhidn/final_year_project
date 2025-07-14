@@ -3,6 +3,7 @@ from .views import (
     userListCreateView, userRetrieveUpdateDestroyView,
     schoolListCreateView, schoolRetrieveUpdateDestroyView,
     schoolAdminListCreateView, schoolAdminRetrieveUpdateDestroyView,
+    requestListCreateView, requestRetrieveUpdateDestroyView,
     loginView
 )
 
@@ -13,5 +14,7 @@ urlpatterns = [
     path('schools/<int:pk>/', schoolRetrieveUpdateDestroyView, name='school-detail'),
     path('school_admins/', schoolAdminListCreateView, name='school-admin-list-create'),
     path('school_admins/<int:pk>/', schoolAdminRetrieveUpdateDestroyView, name='school-admin-detail'),
+    path('requests/', requestListCreateView, name='request-list-create'),
+    path('requests/<int:pk>/', requestRetrieveUpdateDestroyView, name='request-detail'),
     path('login/', loginView, name='login'),
 ]
