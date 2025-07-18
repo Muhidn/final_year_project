@@ -38,4 +38,4 @@ class AttendanceRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView)
     serializer_class = AttendanceSerializer
 
 attendanceRetrieveUpdateDestroyView = AttendanceRetrieveUpdateDestroyView.as_view()
-# Create your views here.
+

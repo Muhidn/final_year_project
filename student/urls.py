@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     StudentListCreateView, StudentRetrieveUpdateDestroyView,
     LectureListCreateView, LectureRetrieveUpdateDestroyView,
-    AttendanceListCreateView, AttendanceRetrieveUpdateDestroyView
+    AttendanceListCreateView, AttendanceRetrieveUpdateDestroyView,
 )
 
 urlpatterns = [
